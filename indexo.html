@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List App</title>
+  <style>
+    body {
+      background-color: #f0f0f0;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .header {
+      background-color: #3498db;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .app {
+      background-color: #ecf0f1;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin: 20px auto;
+      padding: 20px;
+      width: 80%;
+      max-width: 600px;
+    }
+
+    h3 {
+      color: #2c3e50;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    input[type="button"] {
+      background-color: #3498db;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 10px; /* Ajout de la marge en bas du bouton */
+    }
+
+    input[type="button"]:hover {
+      background-color: #2980b9;
+    }
+
+    #list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .task-box {
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 10px;
+    }
+
+    .task-box:hover {
+      background-color: #d2d7db;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <p>To Do</p>
+  </div>
+  <div class="app">
+    <p style="font-size: 18px; font-weight: bold;">Exercise To-Do List</p>
+    <h3>Que faisons nous aujourd'hui ?</h3>
+    <input type="text" id="box" placeholder="Tache"/>
+    <br/>
+    <input type="button" value="Add item" onclick="addItem();"/>
+    <br/>
+    <div id="list"></div>
+  </div>
+
+  <script>
+    let previousColor = '';
+
+    function getRandomPastelColor() {
+      const pastelColors = [
+        '#aed6f1', // Light Blue
+        '#d7bde2', // Lavender
+        '#f9e79f', // Pastel Yellow
+        '#fadbd8', // Pastel Pink
+        '#a9dfbf', // Pastel Green
+      ];
+
+      let color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+
+      // Ensure the next color is different from the previous one
+      while (color === previousColor) {
+        color = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+      }
+
+      previousColor = color;
+      return color;
+    }
+
+    function addItem() {
+      const taskText = document.getElementById("box").value;
+      if (taskText.trim() !== '') {
+        const newTaskBox = document.createElement("div");
+        newTaskBox.className = "task-box";
+        newTaskBox.style.backgroundColor = getRandomPastelColor();
+        newTaskBox.innerHTML = taskText;
+        newTaskBox.onclick = function () {
+          removeItem(this);
+        };
+
+        document.getElementById("list").appendChild(newTaskBox);
+        saveList();
+      }
+    }
+
+    function removeItem(item) {
+      document.getElementById("list").removeChild(item);
+      saveList();
+    }
+
+    function saveList() {
+      const taskBoxes = document.getElementsByClassName("task-box");
+      const taskList = [];
+      for (let i = 0; i < taskBoxes.length; i++) {
+        taskList.push({
+          text: taskBoxes[i].innerHTML,
+          color: taskBoxes[i].style.backgroundColor,
+        });
+      }
+      localStorage.storedList = JSON.stringify(taskList);
+    }
+
+    function loadList() {
+      if (localStorage.storedList) {
+        const storedList = JSON.parse(localStorage.storedList);
+        for (let i = 0; i < storedList.length; i++) {
+          const newTaskBox = document.createElement("div");
+          newTaskBox.className = "task-box";
+          newTaskBox.style.backgroundColor = storedList[i].color;
+          newTaskBox.innerHTML = storedList[i].text;
+          newTaskBox.onclick = function () {
+            removeItem(this);
+          };
+
+          document.getElementById("list").appendChild(newTaskBox);
+        }
+      }
+    }
+
+    loadList();
+  </script>
+</body>
+</html>
